@@ -1,0 +1,9 @@
+{% extends 'parent/base.html' %}
+{% block title %}Post Detail:{% endblock %}
+{% block content %}
+    <h1>Post Detail:</h1>
+    <h2>{{ post.title }} by {{ post.author | capfirst }}</h2>
+    <p>{{ post.description | linebreaks }}</p>
+    <hr>
+    <p>{{ post.publish }}</p>
+{% endblock %}
