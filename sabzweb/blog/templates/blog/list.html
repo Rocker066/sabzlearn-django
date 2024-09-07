@@ -2,11 +2,16 @@
 {% block title %}Post List{% endblock %}
 {% block content %}
     <h1>Posts List:</h1>
+    
+<ol style="--length: {{ posts.count }}" role="list">   
     {% for post in posts %}
-        <h1>
-        <a href="{% url 'blog:post_detail' post.id %}">{{ post.title }}</a>
-        </h1>
-        <p>{{ post.description | truncatewords:5 }}</p>
+        <li style="--i: {{ forloop.counter }}">
+            <h3>
+            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>  {# using absolute url #}
+            {# <a href="{% url 'blog:post_detail' post.id %}">{{ post.title }}</a> #} {# without absolute url #}
+            </h3>
+            <p>{{ post.description | truncatewords:5 }}</p>
+        </li>
     {% endfor %}
-
+</ol>
 {% endblock %}

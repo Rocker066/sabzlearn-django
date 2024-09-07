@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django_jalali.db import models as jmodels
+from django.urls import reverse
 
 
 # Define Custom Manager (optional) to filter queryset of published posts
@@ -24,15 +26,16 @@ class Post(models.Model):
     title = models.CharField(max_length=250)
     description = models.TextField()
     slug = models.SlugField(max_length=250)
-    # Date Fields
-    publish = models.DateTimeField(default=timezone.now)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+    # Date Fields (used jmodels from jalali library to convert the date and time to persian)
+    publish = jmodels.jDateTimeField(default=timezone.now)
+    created = jmodels.jDateTimeField(auto_now_add=True)
+    updated = jmodels.jDateTimeField(auto_now=True)
     # Choices Field
     status = models.CharField(max_length=2, choices=Status.choices, default=Status.DRAFT)
 
-    # instantiate the custom manager for published posts
-    objects = models.Manager()
+    # instantiate the custom manager for published posts (using jmanager to use jalali date library)
+    # objects - models.Manager()
+    objects = jmodels.jManager()
     published = PublishedManager()
 
     # Sorting based on publish field using Meta class and its indexing
@@ -41,6 +44,10 @@ class Post(models.Model):
         indexes = [
             models.Index(fields=['-publish']),
         ]
+
+    # make an absolute path for a url to call in a template (canonical url)
+    def get_absolute_url(self):
+        return reverse('blog:post_detail', args=[self.id])
 
     def __str__(self):
         return self.title
