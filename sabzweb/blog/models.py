@@ -45,7 +45,7 @@ class Post(models.Model):
             models.Index(fields=['-publish']),
         ]
 
-    # make an absolute path for a url to call in a template (canonical url)
+    # make an absolute path for an url to call in a template (Canonical URL)
     def get_absolute_url(self):
         return reverse('blog:post_detail', args=[self.id])
 

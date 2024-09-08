@@ -57,8 +57,8 @@ li::before {
 h1 {
 	width: 350px;
 	height: 70px;
-	background-color: #a92424;
-	color: aliceblue;
+	background-color: floralwhite;
+	color: darkslateblue;
 	text-align: center;
 	border-bottom: 5px solid #c44d1a;
 	border-radius: 10px;
@@ -120,3 +120,14 @@ h3::before {
 	color: midnightblue;
 	font-weight: bold;
 }
+
+.paginator{
+	width: 400px;
+	margin: 0 auto;
+	text-align: center;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	background-color: powderblue;
+	text-justify-trim: inter-word;
+	font-weight: bold;
+}
+
