@@ -51,3 +51,14 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Ticket(models.Model):
+    message = models.TextField(max_length=250, verbose_name='پیام')
+    name = models.EmailField(max_length=250, verbose_name='نام')
+    email = models.EmailField(max_length=250, verbose_name='ایمیل')
+    phone = models.CharField(max_length=11, verbose_name='شماره تماس')
+    subject = models.CharField(max_length=250, verbose_name='موضوع')
+
+    def __str__(self):
+        return self.subject

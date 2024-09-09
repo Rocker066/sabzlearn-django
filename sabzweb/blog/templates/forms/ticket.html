@@ -1,0 +1,12 @@
+{% extends 'parent/base.html' %}
+{% block title %}Ticket Form{% endblock %}
+{% block content %}
+    <h1 class="post_list">Ticket Form</h1>
+    
+    <form class='ticket' method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+    <input type="submit" value="ثبت تیکت">
+    </form>
+
+{% endblock %}

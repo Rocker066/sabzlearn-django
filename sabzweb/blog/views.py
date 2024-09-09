@@ -1,6 +1,7 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, Http404
-from .models import Post
+from .models import Post, Ticket
+from .forms import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView, DetailView
 
@@ -47,3 +48,28 @@ class PostDetailView(DetailView):
     queryset = Post.published.all()
     template_name = 'blog/detail.html'
     context_object_name = 'post'
+
+
+def ticket(request):
+    # if the request is POST, instantiate the TicketForm class
+    if request.method == 'POST':
+        form = TicketForm(request.POST)
+        # if all form fields contain valid data then get them in a dictionary called cleaned data
+        if form.is_valid():
+            # create database fields based on what user has entered in the form
+            ticket_obj = Ticket.objects.create()
+            cd = form.cleaned_data
+            # put the user input in the related object fields in the database(from cleaned data)
+            ticket_obj.message = cd['message']
+            ticket_obj.name = cd['name']
+            ticket_obj.email = cd['email']
+            ticket_obj.phone = cd['phone']
+            ticket_obj.subject = cd['subject']
+            # save the data in the database fields
+            ticket_obj.save()
+            # redirect to the empty ticket page after submitting the form
+            return redirect('blog:ticket')
+    else:
+        # if the user hasn't completed the form show the empty form
+        form = TicketForm()
+    return render(request, 'forms/ticket.html', {'form': form})
