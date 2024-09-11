@@ -1,0 +1,45 @@
+{% extends 'parent/base.html' %}
+{% block title %}Ticket{% endblock %}
+{% block content %}
+    <form class="ticket" method="post">
+    {% csrf_token %}
+        <p><label for="name">Name: </label>
+        <input id="name" type="text" name="name" required maxlength="100"
+        {% if form.name.value %}value="{{ form.name.value }}" {% endif %}></p>
+        
+        <p><label for="email">Email: </label>
+        <input id="email" type="email" name="email" required
+        {% if form.email.value %}value="{{ form.email.value }}" {% endif %}></p>
+        
+        <p><label for="phone">Phone: </label>
+        <input id="phone" type="text" name="phone" required maxlength="11"
+        {% if form.phone.value %}value="{{ form.phone.value }}" {% endif %}></p>
+        
+        <p><label for="subject">Subject: </label>
+        <select id="subject" name="subject">
+            <option value="پیشنهاد">پیشنهادات</option>
+            <option value="انتقاد">انتقادات</option>
+            <option value="گزارش">گزارش</option>
+        </select></p>
+        
+        <p><label for="message">Message: </label>
+        <textarea id="message" name="message">
+            {% if form.message.value %} {{ form.message.value }} {% endif %}
+        </textarea></p>
+        
+        <input type="submit" name="submit" value="submit">
+    </form>
+    {% if form.errors %}
+        <p>لطفا خطاهای زیر را اصلاح کنید!</p>
+        {% for field in form %}
+                {% for error in field.errors %}
+                    {{ field.label }} : {{ error }}
+                    <br>
+                {% endfor %}
+        {% endfor %}
+    {% endif %}
+    
+    {% if form.non_field_errors %}
+        {{ form.non_field_errors }}
+    {% endif %}
+{% endblock %}

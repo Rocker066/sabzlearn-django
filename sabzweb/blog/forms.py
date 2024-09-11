@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 
 
 class TicketForm(forms.Form):
@@ -13,3 +14,12 @@ class TicketForm(forms.Form):
     phone = forms.CharField(max_length=11, required=True, label='شماره تلفن ')
     subject = forms.ChoiceField(choices=SUBJECT_CHOICES, required=True, label='موضوع ')
     message = forms.CharField(widget=forms.Textarea, required=True, label='پیام ')
+
+    # Custom validation check for fields
+    def clean_phone(self):
+        phone = self.cleaned_data['phone']
+        if phone:
+            if not phone.isdigit():
+                raise ValidationError('شماره تلفن باید فقط شامل عدد باشد!')
+            else:
+                return phone

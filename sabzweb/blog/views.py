@@ -58,18 +58,24 @@ def ticket(request):
         if form.is_valid():
             # create database fields based on what user has entered in the form
             ticket_obj = Ticket.objects.create()
+            # get the entered form data (as a dictionary)
             cd = form.cleaned_data
+
+            # Another way of creating db objects (dont need to use save() here)
+            Ticket.objects.create(message=cd['message'], name=cd['name'], email=cd['email'],
+                                  phone=cd['phone'], subject=cd['subject'])
+
             # put the user input in the related object fields in the database(from cleaned data)
-            ticket_obj.message = cd['message']
-            ticket_obj.name = cd['name']
-            ticket_obj.email = cd['email']
-            ticket_obj.phone = cd['phone']
-            ticket_obj.subject = cd['subject']
+            # ticket_obj.message = cd['message']
+            # ticket_obj.name = cd['name']
+            # ticket_obj.email = cd['email']
+            # ticket_obj.phone = cd['phone']
+            # ticket_obj.subject = cd['subject']
             # save the data in the database fields
-            ticket_obj.save()
+            # ticket_obj.save()
             # redirect to the empty ticket page after submitting the form
-            return redirect('blog:ticket')
+            return redirect('blog:index')
     else:
         # if the user hasn't completed the form show the empty form
         form = TicketForm()
-    return render(request, 'forms/ticket.html', {'form': form})
+    return render(request, 'forms/ticket2.html', {'form': form})

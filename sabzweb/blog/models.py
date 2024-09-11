@@ -1,4 +1,5 @@
 from django.db import models
+from django.template.defaultfilters import default
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django_jalali.db import models as jmodels
@@ -62,3 +63,21 @@ class Ticket(models.Model):
 
     def __str__(self):
         return self.subject
+
+
+class Comments(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments', verbose_name='کامنت')
+    name = models.CharField(max_length=250, verbose_name='نام')
+    body = models.TextField(verbose_name='متن کامنت')
+    created = jmodels.jDateTimeField(auto_now_add=True)
+    updated = jmodels.jDateTimeField(auto_now=True)
+    active = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created']
+        indexes = [models.Index(fields=['-created'])]
+        verbose_name = 'کامنت'
+        verbose_name_plural = 'کامنت ها'
+
+    def __str__(self):
+        return f'{self.name}: {self.post}'
