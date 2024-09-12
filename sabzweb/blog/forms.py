@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-
+from .models import Comments
 
 class TicketForm(forms.Form):
     SUBJECT_CHOICES = (
@@ -23,3 +23,17 @@ class TicketForm(forms.Form):
                 raise ValidationError('شماره تلفن باید فقط شامل عدد باشد!')
             else:
                 return phone
+
+
+# Creates a form based of an existing model ( in this case our Comments model) declaring what fields we need from that
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comments
+        fields = ['name', 'body']
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if len(name) < 3:
+            raise forms.ValidationError('نام باید بیشتر از 3 کاراکتر باشد!')
+        else:
+            return name

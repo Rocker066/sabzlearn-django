@@ -9,5 +9,33 @@
     <hr>
     {#<p>{{ post.publish | date:'Y/m (H:i)'}}</p>#}        {# for english time #}
     <p class="paragraph">{{ post.publish | jformat:'%y/%m/%d - %H:%M' }}</p> {# for persian time and date #}
+    <hr>
+
+    {# show the total amount of comments on a post  #}
+    <div>
+        {% with comment.count as cm_count %}
+            {{ cm_count }} comment{{ cm_count|pluralize }}
+        {% endwith %}
+    </div>
+    <br>
+
+    {# show all the comments here #}
+   <div>
+        {% for cm in comment %}
+            {{ cm.body | linebreaks }}
+            <p>نویسنده: {{ cm.name }}</p>
+            <hr>
+            {% empty %}
+            <p>کامنتی وجود ندارد</p>
+        {% endfor %}
+   </div>
+    <br>
+
+    {# show the comments form here #}
+    <form method="post" action="{% url 'blog:post_comment' post.id %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="افزودن کامنت">
+    </form>
     
 {% endblock %}

@@ -4,9 +4,11 @@ from .models import Post, Ticket
 from .forms import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView, DetailView
+from django.views.decorators.http import require_POST
+
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
+    return HttpResponse("Hello, world. You're at the index.")
 
 
 # def post_list(request):
@@ -34,20 +36,27 @@ class PostListView(ListView):
     context_object_name = 'posts'
 
 
-# def post_detail(request, pk):
-#     post = get_object_or_404(Post, pk=pk, status=Post.Status.PUBLISHED)
-#
-#     context = {
-#         'post': post,
-#     }
-#
-#     return render(request, 'blog/detail.html', context)
+def post_detail(request, pk):
+    post = get_object_or_404(Post, pk=pk, status=Post.Status.PUBLISHED)
+
+    # Show active comments on this page
+    comment = post.comments.filter(active=True)
+    # show comment-form on this page
+    form = CommentForm()
+
+    context = {
+        'post': post,
+        'form': form,
+        'comment': comment,
+    }
+
+    return render(request, 'blog/detail.html', context)
 
 
-class PostDetailView(DetailView):
-    queryset = Post.published.all()
-    template_name = 'blog/detail.html'
-    context_object_name = 'post'
+# class PostDetailView(DetailView):
+#     queryset = Post.published.all()
+#     template_name = 'blog/detail.html'
+#     context_object_name = 'post'
 
 
 def ticket(request):
@@ -57,7 +66,8 @@ def ticket(request):
         # if all form fields contain valid data then get them in a dictionary called cleaned data
         if form.is_valid():
             # create database fields based on what user has entered in the form
-            ticket_obj = Ticket.objects.create()
+            # ticket_obj = Ticket.objects.create()
+
             # get the entered form data (as a dictionary)
             cd = form.cleaned_data
 
@@ -79,3 +89,23 @@ def ticket(request):
         # if the user hasn't completed the form show the empty form
         form = TicketForm()
     return render(request, 'forms/ticket2.html', {'form': form})
+
+
+# create a view to get the entered form info and save it (limiting this function to http-POST requests using decorator)
+@require_POST
+def post_comment(request, pk):
+    post = get_object_or_404(Post, pk=pk, status=Post.Status.PUBLISHED)
+    comment = None
+    form = CommentForm(request.POST)
+
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.post = post
+        comment.save()
+
+    context = {
+        'post': post,
+        'form': form,
+        'comment': comment,
+    }
+    return render(request, 'forms/comment.html', context)

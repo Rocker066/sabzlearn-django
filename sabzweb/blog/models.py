@@ -45,6 +45,8 @@ class Post(models.Model):
         indexes = [
             models.Index(fields=['-publish']),
         ]
+        verbose_name = 'پست'
+        verbose_name_plural = 'پست ها'
 
     # make an absolute path for an url to call in a template (Canonical URL)
     def get_absolute_url(self):
@@ -61,12 +63,20 @@ class Ticket(models.Model):
     phone = models.CharField(max_length=11, verbose_name='شماره تماس')
     subject = models.CharField(max_length=250, verbose_name='موضوع')
 
+    class Meta:
+        ordering = ['-message']
+        indexes = [
+            models.Index(fields=['-message']),
+        ]
+        verbose_name = 'تیکت'
+        verbose_name_plural = 'تیکت ها'
+
     def __str__(self):
         return self.subject
 
 
 class Comments(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments', verbose_name='کامنت')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments', verbose_name='پست')
     name = models.CharField(max_length=250, verbose_name='نام')
     body = models.TextField(verbose_name='متن کامنت')
     created = jmodels.jDateTimeField(auto_now_add=True)
@@ -81,3 +91,4 @@ class Comments(models.Model):
 
     def __str__(self):
         return f'{self.name}: {self.post}'
+
