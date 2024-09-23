@@ -31,9 +31,25 @@ class CommentForm(forms.ModelForm):
         model = Comments
         fields = ['name', 'body']
 
+        # #Edit the attributes of each field of the form manually
+        # widgets = {
+        #     'body': forms.TextInput(attrs={
+        #         'placeholder': 'متن',
+        #         'class': 'cm-body'
+        #     }),
+        #     'name': forms.TextInput(attrs={
+        #         'placeholder': 'نام',
+        #         'class': 'cm-name'
+        #     })
+        # }
+
     def clean_name(self):
         name = self.cleaned_data['name']
         if len(name) < 3:
             raise forms.ValidationError('نام باید بیشتر از 3 کاراکتر باشد!')
         else:
             return name
+
+
+class SearchForm(forms.Form):
+    query = forms.CharField()

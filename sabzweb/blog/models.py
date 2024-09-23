@@ -28,15 +28,17 @@ class Post(models.Model):
     description = models.TextField()
     slug = models.SlugField(max_length=250)
     # Date Fields (used jmodels from jalali library to convert the date and time to persian)
-    publish = jmodels.jDateTimeField(default=timezone.now)
-    created = jmodels.jDateTimeField(auto_now_add=True)
-    updated = jmodels.jDateTimeField(auto_now=True)
+    publish = models.DateTimeField(default=timezone.now)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
     # Choices Field
     status = models.CharField(max_length=2, choices=Status.choices, default=Status.DRAFT)
 
+    reading_time = models.PositiveIntegerField(verbose_name='زمان مطالعه')
+
     # instantiate the custom manager for published posts (using jmanager to use jalali date library)
     # objects - models.Manager()
-    objects = jmodels.jManager()
+    objects = models.Manager()
     published = PublishedManager()
 
     # Sorting based on publish field using Meta class and its indexing
@@ -79,8 +81,8 @@ class Comments(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments', verbose_name='پست')
     name = models.CharField(max_length=250, verbose_name='نام')
     body = models.TextField(verbose_name='متن کامنت')
-    created = jmodels.jDateTimeField(auto_now_add=True)
-    updated = jmodels.jDateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
     active = models.BooleanField(default=False)
 
     class Meta:

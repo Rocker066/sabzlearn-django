@@ -1,3 +1,4 @@
+from django.db.models.expressions import result
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, Http404
 from .models import Post, Ticket
@@ -8,7 +9,7 @@ from django.views.decorators.http import require_POST
 
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the index.")
+    return render(request, 'blog/index.html')
 
 
 # def post_list(request):
@@ -109,3 +110,22 @@ def post_comment(request, pk):
         'comment': comment,
     }
     return render(request, 'forms/comment.html', context)
+
+
+# Search Field
+def post_search(request):
+    query = None
+    results = []
+    if 'query' in request.GET:
+        form = SearchForm(request.GET)
+        if form.is_valid():
+            query = form.cleaned_data['query']
+            result1 = Post.published.filter(title__icontains=query)
+            result2 = Post.published.filter(description__icontains=query)
+            results = result1 | result2
+            print(results)
+    context = {
+        'query': query,
+        'results': results
+    }
+    return render(request, 'blog/search.html', context)
