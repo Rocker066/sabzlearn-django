@@ -1,4 +1,4 @@
-from django.db.models.expressions import result
+from django.contrib.postgres.search import SearchVector
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, Http404
 from .models import Post, Ticket
@@ -6,6 +6,7 @@ from .forms import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView, DetailView
 from django.views.decorators.http import require_POST
+from django.db.models import Q
 
 
 def index(request):
@@ -120,10 +121,22 @@ def post_search(request):
         form = SearchForm(request.GET)
         if form.is_valid():
             query = form.cleaned_data['query']
-            result1 = Post.published.filter(title__icontains=query)
-            result2 = Post.published.filter(description__icontains=query)
-            results = result1 | result2
-            print(results)
+
+            ## Search with icontains
+            # result1 = Post.published.filter(title__icontains=query)
+            # result2 = Post.published.filter(description__icontains=query)
+            # results = result1 | result2
+
+            ## The same search result using Q-objects
+            # results = Post.published.filter(Q(title__icontains=query) | Q(description__icontains=query))
+
+            ## The same result using Postgres FTS(Full Text Search)
+            # results = Post.published.filter(Q(title__search=query) | Q(description__search=query))
+
+            # Search using postgres Search-Vector
+            results = Post.published.annotate(search=SearchVector('title',
+                                                                  'description', 'slug')).filter(search=query)
+
     context = {
         'query': query,
         'results': results
