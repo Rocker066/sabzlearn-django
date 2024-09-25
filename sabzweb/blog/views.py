@@ -1,4 +1,4 @@
-from django.contrib.postgres.search import SearchVector
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, Http404
 from .models import Post, Ticket
@@ -134,8 +134,21 @@ def post_search(request):
             # results = Post.published.filter(Q(title__search=query) | Q(description__search=query))
 
             # Search using postgres Search-Vector
-            results = Post.published.annotate(search=SearchVector('title',
-                                                                  'description', 'slug')).filter(search=query)
+            # results = Post.published.annotate(search=SearchVector('title',
+            #                                                       'description', 'slug')).filter(search=query)
+
+            # Using searchQuery
+            # search_query = SearchQuery(query)
+            # results = Post.published.annotate(search=SearchVector('title',
+            #                                                       'description', 'slug')).filter(search=search_query)
+
+            # Using SearchVector + SearchRank
+            search_query = SearchQuery(query)
+            search_vector = (SearchVector('title', weight='A') +
+                             SearchVector('description', weight='A') +
+                             SearchVector('slug', weight='D'))
+            results = Post.published.annotate(search=search_vector, rank=SearchRank(search_vector, search_query)).\
+                                                             filter(rank__gte=0.5).order_by('-rank')
 
     context = {
         'query': query,
