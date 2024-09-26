@@ -11,6 +11,7 @@
             {# <a href="{% url 'blog:post_detail' post.id %}">{{ post.title }}</a> #} {# without absolute url #}
             </h3>
             <p>{{ post.description | truncatewords:5 }}</p>
+            <img src="{{ post.images.first.image_file.url }}" alt="{{ post.images.first.title }}">
         </li>
     {% endfor %}
 </ol>
