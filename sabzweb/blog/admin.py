@@ -2,6 +2,18 @@ from django.contrib import admin
 from django_jalali.admin.filters import JDateFieldListFilter
 from .models import *
 
+
+# Inlines
+class ImageInline(admin.TabularInline):
+    model = Image
+    extra = 0
+
+
+class CommentInline(admin.TabularInline):
+    model = Comments
+    extra = 0
+
+
 # Register your models here.
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
@@ -14,6 +26,7 @@ class PostAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     list_editable = ['status',]
     # list_display_links = ['author']
+    inlines = [ImageInline, CommentInline]
 
 
 @admin.register(Ticket)

@@ -26,4 +26,5 @@ urlpatterns = [
     path('blog/', include('blog.urls'), name='blog'),
 ]
 
+# For showing media and images
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
