@@ -1,13 +1,14 @@
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, TrigramSimilarity
+from django.db.transaction import commit
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, Http404
-from .models import Post, Ticket
+from .models import Post, Ticket, Image
 from .forms import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView, DetailView
 from django.views.decorators.http import require_POST
 from django.db.models import Q
-
+from itertools import chain
 
 def index(request):
     return render(request, 'blog/index.html')
@@ -155,10 +156,47 @@ def post_search(request):
                 .filter(similarity__gt=0.1)
             results2 = Post.published.annotate(similarity=TrigramSimilarity('description', query))\
                 .filter(similarity__gt=0.1)
-            results = (results1 | results2).order_by('-similarity')
+            results3 = Image.objects.annotate(similarity=TrigramSimilarity('title', query)).filter(similarity__gt=0.1)
+            # results = (results1 | results2 | results3).order_by('-similarity')
+            results = list(chain(results1, results2, results3))
+            print(results)
 
     context = {
         'query': query,
         'results': results
     }
     return render(request, 'blog/search.html', context)
+
+
+def profile(request):
+    user = request.user
+    posts = Post.published.filter(author=user)
+    context = {
+        'posts': posts
+    }
+    return render(request, 'blog/profile.html', context)
+
+
+def create_post(request):
+    if request.method == 'POST':
+        form = CreatePostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            Image.objects.create(image_file=form.cleaned_data['image1'], post=post)
+            Image.objects.create(image_file=form.cleaned_data['image2'], post=post)
+            return redirect('blog:profile')
+    else:
+        form = CreatePostForm()
+    return render(request, 'forms/create_post.html', {'form': form})
+
+
+def delete_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.method == 'POST':
+        post.delete()
+        return redirect('blog:profile')
+    return render(request, 'forms/delete_post.html', {'post': post})
+
+

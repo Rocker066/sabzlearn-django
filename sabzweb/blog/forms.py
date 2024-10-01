@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Comments
+from .models import *
 
 class TicketForm(forms.Form):
     SUBJECT_CHOICES = (
@@ -53,3 +53,13 @@ class CommentForm(forms.ModelForm):
 
 class SearchForm(forms.Form):
     query = forms.CharField()
+
+
+class CreatePostForm(forms.ModelForm):
+    # Adding image field because post model doesn't have it
+    image1 = forms.ImageField(label='تصویر اول')
+    image2 = forms.ImageField(label='تصویر دوم')
+
+    class Meta:
+        model = Post
+        fields = ['title', 'description', 'reading_time']
