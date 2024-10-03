@@ -200,3 +200,25 @@ def delete_post(request, pk):
     return render(request, 'forms/delete_post.html', {'post': post})
 
 
+def edit_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.method == 'POST':
+        form = CreatePostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            Image.objects.create(image_file=form.cleaned_data['image1'], post=post)
+            Image.objects.create(image_file=form.cleaned_data['image2'], post=post)
+            return redirect('blog:profile')
+    else:
+        form = CreatePostForm(instance=post)
+    return render(request, 'forms/create_post.html', {'form': form, 'post': post})
+
+
+def delete_image(request, pk):
+    image = get_object_or_404(Image, pk=pk)
+    if request.method == 'POST':
+        image.delete()
+        return redirect('blog:profile')
+    return render(request, 'forms/delete_image.html', {'image': image})

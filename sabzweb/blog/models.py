@@ -131,6 +131,12 @@ class Image(models.Model):
         verbose_name = 'عکس'
         verbose_name_plural = 'عکس ها'
 
+    # override delete method to delete all the images of a post when the post is deleted
+    def delete(self, *args, **kwargs):
+        storage, path = self.image_file.storage, self.image_file.path
+        storage.delete(path)
+        super().delete(*args, **kwargs)
+
     def __str__(self):
         return self.title if self.title else self.image_file.name
 
