@@ -1,0 +1,15 @@
+{% extends 'parent/base.html' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+    <h1>ورود</h1>
+    <p>لطفا اطلاعات خود را وارد کنید:</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        
+        {# after a login-required page and logging in, goes back to where the user was before login (next) #}
+        <input type="hidden" name="next" value="{{ next }}">
+        
+        <input type="submit" value="ورود">
+    </form>
+{% endblock %}

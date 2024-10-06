@@ -18,4 +18,12 @@
             </tr>
     {% endfor %}
     </table>
+    
+{# Implementing the logout button #}
+<form method="post" action="{% url 'blog:logout' %}">
+    {% csrf_token %}
+    <button type="submit">خروج</button>
+</form>
+    <a href="{% url 'blog:password_change' %}">تغییر پسورد</a>
+    
 {% endblock %}

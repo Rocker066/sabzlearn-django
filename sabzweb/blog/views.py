@@ -9,6 +9,8 @@ from django.views.generic import ListView, DetailView
 from django.views.decorators.http import require_POST
 from django.db.models import Q
 from itertools import chain
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
 def index(request):
     return render(request, 'blog/index.html')
@@ -168,6 +170,7 @@ def post_search(request):
     return render(request, 'blog/search.html', context)
 
 
+@login_required
 def profile(request):
     user = request.user
     posts = Post.published.filter(author=user)
@@ -177,6 +180,7 @@ def profile(request):
     return render(request, 'blog/profile.html', context)
 
 
+@login_required
 def create_post(request):
     if request.method == 'POST':
         form = CreatePostForm(request.POST, request.FILES)
@@ -192,6 +196,7 @@ def create_post(request):
     return render(request, 'forms/create_post.html', {'form': form})
 
 
+@login_required
 def delete_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
     if request.method == 'POST':
@@ -200,6 +205,7 @@ def delete_post(request, pk):
     return render(request, 'forms/delete_post.html', {'post': post})
 
 
+@login_required
 def edit_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
     if request.method == 'POST':
@@ -215,10 +221,37 @@ def edit_post(request, pk):
         form = CreatePostForm(instance=post)
     return render(request, 'forms/create_post.html', {'form': form, 'post': post})
 
-
+@login_required
 def delete_image(request, pk):
     image = get_object_or_404(Image, pk=pk)
     if request.method == 'POST':
         image.delete()
         return redirect('blog:profile')
     return render(request, 'forms/delete_image.html', {'image': image})
+
+
+# Function-based view for user-login
+# def user_login(request):
+#     if request.method == 'POST':
+#         form = LoginForm(request.POST)
+#         if form.is_valid():
+#             cd = form.cleaned_data
+#             user = authenticate(request, username=cd['username'], password=cd['password'])
+#             if user is not None:
+#                 if user.is_active:
+#                     login(request, user)
+#                     return redirect('blog:profile')
+#                 else:
+#                     return HttpResponse('Your account is disabled!')
+#             else:
+#                 return HttpResponse('You are not logged in!')
+#     else:
+#         form = LoginForm()
+#     return render(request, 'forms/login.html', context={'form': form})
+
+
+# user logout template view (override the default)
+def log_out(request):
+    logout(request)
+    # After logout and
+    return redirect(request.META.get('HTTP_REFERER'))
